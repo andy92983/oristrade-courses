@@ -1,0 +1,903 @@
+"use client";
+// OrisTrade AI v1.1
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useAuth } from "../../lib/supabase/useAuth";
+import { supabase } from "../../lib/supabase/client";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
+interface Conversation {
+  id: string;
+  title: string;
+  model: string;
+  updated_at: string;
+}
+
+const MODELS = [
+  {
+    id: "openai/gpt-oss-120b:free",
+    label: "GPT OSS 120B",
+    desc: "OpenAI open-source 120B — best quality",
+    badge: "FREE",
+    badgeColor: "text-brand-green border-brand-green/30 bg-brand-green/10",
+    tier: "free",
+    vision: false,
+  },
+  {
+    id: "nvidia/nemotron-3-nano-30b-a3b:free",
+    label: "Nemotron Nano 30B",
+    desc: "NVIDIA — compact & fast",
+    badge: "FREE",
+    badgeColor: "text-brand-green border-brand-green/30 bg-brand-green/10",
+    tier: "free",
+    vision: false,
+  },
+  {
+    id: "arcee-ai/trinity-large-preview:free",
+    label: "Trinity Large",
+    desc: "Arcee AI — enterprise reasoning",
+    badge: "FREE",
+    badgeColor: "text-brand-green border-brand-green/30 bg-brand-green/10",
+    tier: "free",
+    vision: false,
+  },
+];
+
+const TIER_RANK: Record<string, number> = { free: 0, starter: 1, pro: 2, elite: 3, vip: 4 };
+
+const SYSTEM_PROMPT = `You are OrisTrade AI, the intelligent trading assistant for OrisTrade (oristrade.com) — a precision trading platform combining institutional-grade signal analysis with member education.
+
+Your core expertise:
+- **Technical Analysis**: Price action, support/resistance, chart patterns (H&S, wedges, flags), Elliott Wave, Wyckoff, ICT/SMC concepts (order blocks, FVGs, BOS, CHoCH, liquidity sweeps)
+- **Options Trading**: Credit spreads (bull put, bear call), iron condors/butterflies, Greeks (Delta/Theta/Vega/Gamma/Vanna), IV rank (IVR), GEX (Gamma Exposure), max pain, defined-risk strategies
+- **Futures Trading**: ES/NQ/CL/GC scalping and swing trading, VWAP, volume profile (POC, VAH, VAL), order flow, footprint charts, market profile
+- **Macro Economics**: Fed policy & dot plots, yield curve dynamics, DXY relationships, VIX term structure, CPI/PCE interpretation, PMI, treasury flows
+- **OrisTrade Indicators**: OT Master Confluence (OT·MC v2) — AlgoPro ATR bands + Supertrend + SMC + EvoX Dynamic HTF scoring + RayAlgo fan + FVVO volume pressure + Van de Poppe EMA ribbon (8/13/21/34/55) + Tone Vays RSI (65/35 thresholds) + ADX/DMI. Signal fires when EvoX score ≥ 4/6.
+- **Risk Management**: ATR-based position sizing, Kelly criterion, R:R optimization, max drawdown frameworks, portfolio heat
+- **Pine Script**: TradingView indicator and strategy development
+
+Always be precise, specific, and actionable. Give real levels, exact percentages, and concrete trade setups. You are the analytical edge every trader needs. Keep responses focused and structured — use headers and bullet points for complex answers.`;
+
+const QUICK_PROMPTS = [
+  { icon: "📊", text: "Explain credit spreads with a real trade example" },
+  { icon: "⚡", text: "What is GEX and how does it move SPX price?" },
+  { icon: "🎯", text: "Walk me through volume profile and VWAP strategy" },
+  { icon: "🛡️", text: "Best risk management framework for futures trading" },
+  { icon: "🏦", text: "How to identify smart money accumulation zones (ICT/SMC)" },
+  { icon: "🔬", text: "Explain the EvoX confluence scoring system" },
+  { icon: "📰", text: "What macro data should I watch before each trading day?" },
+  { icon: "📐", text: "How to set stops with ATR and position size correctly" },
+];
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function groupConversationsByDate(convs: Conversation[]) {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const groups: Record<string, Conversation[]> = { Today: [], Yesterday: [], Older: [] };
+  convs.forEach((c) => {
+    const d = new Date(c.updated_at);
+    if (d.toDateString() === today.toDateString()) groups["Today"].push(c);
+    else if (d.toDateString() === yesterday.toDateString()) groups["Yesterday"].push(c);
+    else groups["Older"].push(c);
+  });
+  return groups;
+}
+
+function renderContent(content: string) {
+  if (!content) return null;
+  const lines = content.split("\n");
+  const elements: React.JSX.Element[] = [];
+  let inCodeBlock = false;
+  let codeLines: string[] = [];
+  let codeLang = "";
+  let key = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith("```")) {
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        codeLang = line.slice(3).trim();
+        codeLines = [];
+      } else {
+        elements.push(
+          <pre key={key++} className="bg-[#0d1117] border border-brand-border rounded-lg p-4 overflow-x-auto my-3">
+            <code className="text-sm text-green-300 font-mono">{codeLines.join("\n")}</code>
+          </pre>
+        );
+        inCodeBlock = false;
+        codeLines = [];
+      }
+      continue;
+    }
+    if (inCodeBlock) {
+      codeLines.push(line);
+      continue;
+    }
+    if (line.startsWith("### ")) {
+      elements.push(<h3 key={key++} className="text-brand-gold font-semibold text-base mt-4 mb-1">{line.slice(4)}</h3>);
+    } else if (line.startsWith("## ")) {
+      elements.push(<h2 key={key++} className="text-white font-bold text-lg mt-4 mb-1">{line.slice(3)}</h2>);
+    } else if (line.startsWith("# ")) {
+      elements.push(<h1 key={key++} className="text-white font-bold text-xl mt-4 mb-2">{line.slice(2)}</h1>);
+    } else if (line.startsWith("- ") || line.startsWith("* ")) {
+      elements.push(
+        <li key={key++} className="ml-4 text-gray-300 text-sm leading-relaxed list-disc">
+          {renderInline(line.slice(2))}
+        </li>
+      );
+    } else if (/^\d+\.\s/.test(line)) {
+      const text = line.replace(/^\d+\.\s/, "");
+      elements.push(
+        <li key={key++} className="ml-4 text-gray-300 text-sm leading-relaxed list-decimal">
+          {renderInline(text)}
+        </li>
+      );
+    } else if (line.startsWith("---")) {
+      elements.push(<hr key={key++} className="border-brand-border my-3" />);
+    } else if (line.trim() === "") {
+      elements.push(<div key={key++} className="h-2" />);
+    } else {
+      elements.push(
+        <p key={key++} className="text-gray-300 text-sm leading-relaxed">
+          {renderInline(line)}
+        </p>
+      );
+    }
+  }
+  return elements;
+}
+
+function renderInline(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={i} className="bg-[#0d1117] text-green-300 text-xs px-1.5 py-0.5 rounded font-mono">{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+}
+
+export default function AIPage() {
+  const { user, profile, loading } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(MODELS[2].id); // Default to Trinity Large
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConvId, setCurrentConvId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chatSidebarCollapsed, setChatSidebarCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ot-chat-sidebar-collapsed") === "true";
+    }
+    return false;
+  });
+  const [showModelPicker, setShowModelPicker] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [attachedFile, setAttachedFile] = useState<{
+    name: string;
+    kind: "text" | "image" | "pdf";
+    content: string;   // text content for text files; base64 data URL for image/pdf
+    mimeType?: string;
+  } | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const workerUrl = process.env.NEXT_PUBLIC_SIGNAL_WORKER_URL || "https://oristrade-signals.bergstromfinancials.workers.dev";
+  const userTier = profile?.tier || "free";
+  const userTierRank = TIER_RANK[userTier] || 0;
+  const currentModel = MODELS.find((m) => m.id === selectedModel) || MODELS[0];
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem("ot-chat-sidebar-collapsed", String(chatSidebarCollapsed));
+  }, [chatSidebarCollapsed]);
+
+  useEffect(() => {
+    if (user) loadConversations();
+  }, [user]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 180) + "px";
+    }
+  }, [input]);
+
+  async function loadConversations() {
+    if (!user || !supabase) return;
+    const { data } = await supabase
+      .from("ai_conversations")
+      .select("id, title, model, updated_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .limit(30);
+    if (data) setConversations(data);
+  }
+
+  async function createConversation(firstMsg: string, modelId?: string): Promise<string | null> {
+    if (!user || !supabase) return null;
+    const title = firstMsg.slice(0, 70) + (firstMsg.length > 70 ? "…" : "");
+    const { data } = await supabase
+      .from("ai_conversations")
+      .insert({ user_id: user.id, title, model: modelId ?? selectedModel })
+      .select()
+      .single();
+    if (data) {
+      setCurrentConvId(data.id);
+      setConversations((prev) => [data, ...prev]);
+      return data.id;
+    }
+    return null;
+  }
+
+  async function saveMessage(convId: string, role: string, content: string) {
+    if (!supabase) return;
+    await supabase.from("ai_messages").insert({ conversation_id: convId, role, content });
+  }
+
+  async function loadConversation(convId: string) {
+    if (!supabase) return;
+    setCurrentConvId(convId);
+    const { data } = await supabase
+      .from("ai_messages")
+      .select("*")
+      .eq("conversation_id", convId)
+      .order("created_at", { ascending: true });
+    if (data) {
+      setMessages(
+        data
+          .filter((m) => m.role !== "system")
+          .map((m) => ({
+            id: m.id,
+            role: m.role as "user" | "assistant",
+            content: m.content,
+            timestamp: new Date(m.created_at),
+          }))
+      );
+    }
+    setSidebarOpen(false);
+  }
+
+  async function deleteConversation(convId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!supabase) return;
+    await supabase.from("ai_conversations").delete().eq("id", convId);
+    setConversations((prev) => prev.filter((c) => c.id !== convId));
+    if (currentConvId === convId) newChat();
+  }
+
+  function newChat() {
+    setMessages([]);
+    setCurrentConvId(null);
+    setInput("");
+    setSidebarOpen(false);
+  }
+
+  const sendMessage = useCallback(
+    async (content?: string) => {
+      const rawText = (content ?? input).trim();
+      const file = attachedFile;
+      if ((!rawText && !file) || isStreaming) return;
+
+      // Auto-switch to a vision model if needed
+      let activeModel = selectedModel;
+      if (file && (file.kind === "image" || file.kind === "pdf")) {
+        const modelDef = MODELS.find((m) => m.id === selectedModel);
+        if (!modelDef?.vision) {
+          const bestVision = MODELS.find((m) => m.vision && TIER_RANK[m.tier] <= userTierRank);
+          if (bestVision) {
+            activeModel = bestVision.id;
+            setSelectedModel(bestVision.id);
+          }
+        }
+      }
+
+      setInput("");
+      setAttachedFile(null);
+      setShowModelPicker(false);
+
+      // Display label for the message bubble
+      const displayText = file
+        ? `[📎 ${file.name}]${rawText ? "\n\n" + rawText : ""}`
+        : rawText;
+
+      const userMsg: Message = {
+        id: Date.now().toString(),
+        role: "user",
+        content: displayText,
+        timestamp: new Date(),
+      };
+      const updatedMessages = [...messages, userMsg];
+      setMessages(updatedMessages);
+      setIsStreaming(true);
+
+      // Build API content for this user turn (multipart if file attached)
+      type ApiContent = string | { type: string; text?: string; image_url?: { url: string } }[];
+      let userApiContent: ApiContent;
+      if (file && (file.kind === "image" || file.kind === "pdf")) {
+        const parts: { type: string; text?: string; image_url?: { url: string } }[] = [
+          { type: "image_url", image_url: { url: file.content } },
+        ];
+        if (rawText) parts.push({ type: "text", text: rawText });
+        userApiContent = parts;
+      } else if (file && file.kind === "text") {
+        userApiContent = `[Attached: ${file.name}]\n\`\`\`\n${file.content}\n\`\`\`${rawText ? "\n\n" + rawText : ""}`;
+      } else {
+        userApiContent = rawText;
+      }
+
+      const saveText = typeof userApiContent === "string" ? userApiContent : displayText;
+      let convId = currentConvId;
+      if (!convId && user) convId = await createConversation(saveText, activeModel);
+      if (convId && user) await saveMessage(convId, "user", saveText);
+
+      const apiMessages = [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...updatedMessages.slice(0, -1).map((m) => ({ role: m.role, content: m.content })),
+        { role: "user", content: userApiContent },
+      ];
+
+      const assistantId = (Date.now() + 1).toString();
+      setMessages((prev) => [
+        ...prev,
+        { id: assistantId, role: "assistant", content: "", timestamp: new Date() },
+      ]);
+
+      try {
+        abortRef.current = new AbortController();
+        const res = await fetch(`${workerUrl}/ai/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: activeModel, messages: apiMessages }),
+          signal: abortRef.current.signal,
+        });
+
+        if (!res.ok || !res.body) {
+          const raw = await res.text().catch(() => "");
+          if (res.status === 402) {
+            throw new Error("This model requires OpenRouter credits. Add credits at openrouter.ai/settings/credits, or switch to a FREE model.");
+          }
+          if (res.status === 404) {
+            throw new Error("Model not available. Please select a different model.");
+          }
+          throw new Error(`Worker ${res.status}: ${raw}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let assistantContent = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          for (const line of chunk.split("\n")) {
+            if (!line.startsWith("data: ")) continue;
+            const raw = line.slice(6).trim();
+            if (raw === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(raw);
+              const delta = parsed.choices?.[0]?.delta?.content || "";
+              assistantContent += delta;
+              setMessages((prev) =>
+                prev.map((m) => (m.id === assistantId ? { ...m, content: assistantContent } : m))
+              );
+            } catch (_) {}
+          }
+        }
+
+        if (convId && user && assistantContent) {
+          await saveMessage(convId, "assistant", assistantContent);
+        }
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, content: `⚠️ Error: ${err.message || "Failed to reach AI. Please try again."}` }
+                : m
+            )
+          );
+        }
+      } finally {
+        setIsStreaming(false);
+      }
+    },
+    [input, isStreaming, messages, selectedModel, currentConvId, user, workerUrl, attachedFile]
+  );
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function copyMessage(id: string, content: string) {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(id);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  }
+
+  function stopStreaming() {
+    abortRef.current?.abort();
+    setIsStreaming(false);
+  }
+
+  const convGroups = groupConversationsByDate(conversations);
+
+  return (
+    <div className="bg-[#060C18] p-3 md:p-4 min-h-screen">
+    <div className="flex h-[90vh] rounded-xl overflow-hidden border border-brand-border shadow-[0_0_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(20,50,70,0.4)]">
+      {/* ── Sidebar overlay on mobile ── */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* ── Sidebar ── */}
+      <aside
+        className={`
+          fixed md:relative z-50 md:z-auto
+          flex flex-col h-full
+          bg-[#0d1420] border-r border-brand-border
+          transition-all duration-200
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          ${chatSidebarCollapsed ? "md:w-0 md:overflow-hidden md:border-r-0" : "w-72"}
+        `}
+      >
+        {/* Sidebar header */}
+        <div className="p-4 border-b border-brand-border">
+          <button
+            onClick={newChat}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border border-brand-gold/30 bg-brand-gold/5 hover:bg-brand-gold/10 text-brand-gold text-sm font-medium transition-colors"
+          >
+            <span className="text-lg">✦</span>
+            New Chat
+          </button>
+        </div>
+
+        {/* Model badge */}
+        <div className="px-4 py-3 border-b border-brand-border">
+          <div className="text-[10px] uppercase tracking-widest text-brand-muted mb-1.5">Active Model</div>
+          <div className="flex items-center gap-2">
+            <span className="text-white text-xs font-medium truncate">{currentModel.label}</span>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded border font-bold ${currentModel.badgeColor}`}>
+              {currentModel.badge}
+            </span>
+          </div>
+        </div>
+
+        {/* Conversation history */}
+        <div className="flex-1 overflow-y-auto py-2">
+          {!user ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-brand-muted text-xs leading-relaxed mb-3">
+                Sign in to save and revisit your conversations
+              </p>
+              <Link href="/login" className="text-brand-gold text-xs hover:underline">
+                Sign in →
+              </Link>
+            </div>
+          ) : conversations.length === 0 ? (
+            <div className="px-4 py-6 text-center text-brand-muted text-xs">
+              No conversations yet — start chatting!
+            </div>
+          ) : (
+            Object.entries(convGroups).map(([group, convs]) =>
+              convs.length > 0 ? (
+                <div key={group}>
+                  <div className="px-4 py-2 text-[10px] uppercase tracking-widest text-brand-muted">
+                    {group}
+                  </div>
+                  {convs.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => loadConversation(c.id)}
+                      className={`w-full text-left px-4 py-2.5 hover:bg-white/5 transition-colors group flex items-center gap-2 ${
+                        currentConvId === c.id ? "bg-white/5 border-l-2 border-brand-gold" : ""
+                      }`}
+                    >
+                      <span className="text-brand-muted text-xs flex-1 truncate leading-snug">
+                        {c.title}
+                      </span>
+                      <button
+                        onClick={(e) => deleteConversation(c.id, e)}
+                        className="opacity-0 group-hover:opacity-100 text-brand-muted hover:text-brand-red text-xs transition-opacity"
+                        title="Delete"
+                      >
+                        ✕
+                      </button>
+                    </button>
+                  ))}
+                </div>
+              ) : null
+            )
+          )}
+        </div>
+
+        {/* Sidebar footer */}
+        {user && (
+          <div className="p-4 border-t border-brand-border">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-brand-gold/20 flex items-center justify-center">
+                <span className="text-brand-gold text-xs font-bold">
+                  {(profile?.full_name || user.email || "U")[0].toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-white text-xs font-medium truncate">
+                  {profile?.full_name || user.email}
+                </div>
+                <div className="text-brand-muted text-[10px] capitalize">{userTier} tier</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* ── Main Chat Area ── */}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* Chat header */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-brand-border bg-brand-bg/95 backdrop-blur-sm shrink-0">
+          {/* Mobile sidebar toggle */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="md:hidden p-1.5 text-brand-muted hover:text-white transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* Desktop sidebar collapse toggle */}
+          <button
+            onClick={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
+            className="hidden md:flex p-1.5 text-brand-muted hover:text-white transition-colors"
+            title={chatSidebarCollapsed ? "Show history" : "Hide history"}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {chatSidebarCollapsed ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              )}
+            </svg>
+          </button>
+
+          {/* Title */}
+          <div className="flex items-center gap-2 flex-1">
+            <div className="w-7 h-7 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center">
+              <span className="text-brand-gold text-sm">✦</span>
+            </div>
+            <div>
+              <span className="text-white font-semibold text-sm">OrisTrade AI</span>
+              <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded border text-brand-green border-brand-green/30 bg-brand-green/10">
+                LIVE
+              </span>
+            </div>
+          </div>
+
+          {/* Model selector */}
+          <div className="relative">
+            <button
+              onClick={() => setShowModelPicker(!showModelPicker)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-card border border-brand-border hover:border-brand-gold/30 transition-colors text-xs text-white"
+            >
+              <span className="hidden sm:inline text-brand-muted">Model:</span>
+              <span className="font-medium">{currentModel.label}</span>
+              <span className={`text-[9px] px-1 py-0.5 rounded border font-bold ${currentModel.badgeColor}`}>
+                {currentModel.badge}
+              </span>
+              <svg className="w-3 h-3 text-brand-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showModelPicker && (
+              <>
+                {/* Click-outside overlay */}
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowModelPicker(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-72 bg-brand-card border border-brand-border rounded-xl shadow-2xl z-50 flex flex-col max-h-[min(480px,80vh)]">
+                <div className="px-3 py-2 border-b border-brand-border shrink-0">
+                  <span className="text-[10px] uppercase tracking-widest text-brand-muted">Select Model</span>
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  {MODELS.map((m) => {
+                    const locked = TIER_RANK[m.tier] > userTierRank && !profile?.is_admin;
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => {
+                          if (!locked) { setSelectedModel(m.id); setShowModelPicker(false); }
+                        }}
+                        className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${
+                          locked
+                            ? "opacity-40 cursor-not-allowed"
+                            : "hover:bg-white/5 cursor-pointer"
+                        } ${selectedModel === m.id ? "bg-white/5" : ""}`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white text-sm font-medium">{m.label}</span>
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded border font-bold ${m.badgeColor}`}>
+                              {m.badge}
+                            </span>
+                            {locked && <span className="text-brand-muted text-[9px]">🔒 {m.tier}+</span>}
+                          </div>
+                          <span className="text-brand-muted text-xs">{m.desc}</span>
+                        </div>
+                        {selectedModel === m.id && (
+                          <span className="text-brand-gold text-sm">✓</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* New chat (desktop) */}
+          <button
+            onClick={newChat}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-card border border-brand-border hover:border-brand-gold/30 text-brand-muted hover:text-white text-xs transition-colors"
+          >
+            <span>+</span> New
+          </button>
+        </div>
+
+        {/* Messages area */}
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto px-4 py-6 space-y-6"
+          onClick={() => setShowModelPicker(false)}
+        >
+          {messages.length === 0 ? (
+            /* Welcome screen */
+            <div className="max-w-2xl mx-auto pt-8">
+              <div className="text-center mb-10">
+                <div className="w-16 h-16 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-gold/10">
+                  <span className="text-brand-gold text-3xl">✦</span>
+                </div>
+                <h1 className="text-2xl font-bold text-white mb-2">OrisTrade AI</h1>
+                <p className="text-brand-muted text-sm max-w-md mx-auto leading-relaxed">
+                  Your institutional-grade trading intelligence. Ask anything about markets, options, futures, macro, risk management, or Pine Script.
+                </p>
+                {!user && (
+                  <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-gold/5 border border-brand-gold/20 text-brand-gold text-xs">
+                    <span>💡</span>
+                    <Link href="/signup" className="hover:underline">Sign up free</Link>
+                    <span className="text-brand-muted">to save your conversations</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Quick prompts */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {QUICK_PROMPTS.map((p) => (
+                  <button
+                    key={p.text}
+                    onClick={() => sendMessage(p.text)}
+                    className="text-left px-4 py-3 rounded-xl bg-brand-card border border-brand-border hover:border-brand-gold/30 hover:bg-brand-gold/5 transition-all group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-lg shrink-0">{p.icon}</span>
+                      <span className="text-brand-muted group-hover:text-white text-sm leading-snug transition-colors">
+                        {p.text}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Messages */
+            <div className="max-w-3xl mx-auto space-y-6">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                >
+                  {/* Avatar */}
+                  <div
+                    className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${
+                      msg.role === "user"
+                        ? "bg-brand-gold/20 text-brand-gold"
+                        : "bg-brand-gold/10 border border-brand-gold/20 text-brand-gold"
+                    }`}
+                  >
+                    {msg.role === "user"
+                      ? (profile?.full_name || user?.email || "U")[0].toUpperCase()
+                      : "✦"}
+                  </div>
+
+                  {/* Bubble */}
+                  <div className={`flex-1 max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col gap-1`}>
+                    <div
+                      className={`rounded-2xl px-4 py-3 ${
+                        msg.role === "user"
+                          ? "bg-brand-gold/15 border border-brand-gold/20 rounded-tr-sm"
+                          : "bg-brand-card border border-brand-border rounded-tl-sm"
+                      }`}
+                    >
+                      {msg.role === "user" ? (
+                        <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      ) : msg.content === "" ? (
+                        <div className="flex items-center gap-1.5 py-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce [animation-delay:0.15s]" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce [animation-delay:0.3s]" />
+                        </div>
+                      ) : (
+                        <div className="prose-sm">{renderContent(msg.content)}</div>
+                      )}
+                    </div>
+
+                    {/* Message footer */}
+                    <div className={`flex items-center gap-2 px-1 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                      <span className="text-[10px] text-brand-muted">{formatTime(msg.timestamp)}</span>
+                      {msg.role === "assistant" && msg.content && (
+                        <button
+                          onClick={() => copyMessage(msg.id, msg.content)}
+                          className="text-[10px] text-brand-muted hover:text-white transition-colors"
+                          title="Copy"
+                        >
+                          {copied === msg.id ? "✓ Copied" : "Copy"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input area */}
+        <div
+          className="shrink-0 border-t border-brand-border bg-brand-bg/95 backdrop-blur-sm px-4 py-4"
+          onClick={() => setShowModelPicker(false)}
+        >
+          <div className="max-w-3xl mx-auto">
+            {/* Attached file badge */}
+            {attachedFile && (
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <div className="flex items-center gap-2 bg-brand-card border border-brand-border rounded-lg px-3 py-1.5 text-xs text-white">
+                  {attachedFile.kind === "image" ? (
+                    <img src={attachedFile.content} alt={attachedFile.name} className="w-8 h-8 rounded object-cover shrink-0" />
+                  ) : (
+                    <svg className="w-3.5 h-3.5 text-brand-gold shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                  )}
+                  <span className="truncate max-w-[200px]">{attachedFile.name}</span>
+                  <button
+                    onClick={() => setAttachedFile(null)}
+                    className="text-brand-muted hover:text-brand-red transition-colors ml-1"
+                  >✕</button>
+                </div>
+              </div>
+            )}
+            <div className="flex items-end gap-3 bg-brand-card border border-brand-border rounded-2xl px-4 py-3 focus-within:border-brand-gold/40 transition-colors">
+              {/* Upload button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isStreaming}
+                className="shrink-0 p-1 text-brand-muted hover:text-white disabled:opacity-30 transition-colors"
+                title="Attach file"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept=".txt,.md,.csv,.json,.py,.js,.ts,.tsx,.jsx,.pine,.log,.xml,.yaml,.yml,.toml,.html,.css,.pdf,.jpg,.jpeg,.png,.gif,.webp,.svg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const isImage = file.type.startsWith("image/");
+                  const isPdf = file.type === "application/pdf";
+                  const reader = new FileReader();
+                  if (isImage || isPdf) {
+                    reader.onload = (ev) => {
+                      const dataUrl = ev.target?.result as string;
+                      setAttachedFile({
+                        name: file.name,
+                        kind: isImage ? "image" : "pdf",
+                        content: dataUrl,
+                        mimeType: file.type,
+                      });
+                    };
+                    reader.readAsDataURL(file);
+                  } else {
+                    reader.onload = (ev) => {
+                      const text = ev.target?.result as string;
+                      setAttachedFile({ name: file.name, kind: "text", content: text.slice(0, 20000) });
+                    };
+                    reader.readAsText(file);
+                  }
+                  e.target.value = "";
+                }}
+              />
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask anything about markets, options, futures, macro..."
+                rows={1}
+                className="flex-1 bg-transparent text-white text-sm placeholder-brand-muted resize-none outline-none leading-relaxed min-h-[24px]"
+                disabled={isStreaming}
+              />
+              {isStreaming ? (
+                <button
+                  onClick={stopStreaming}
+                  className="shrink-0 w-9 h-9 rounded-xl bg-brand-red/20 border border-brand-red/30 flex items-center justify-center text-brand-red hover:bg-brand-red/30 transition-colors"
+                  title="Stop"
+                >
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  onClick={() => sendMessage()}
+                  disabled={!input.trim() && !attachedFile}
+                  className="shrink-0 w-9 h-9 rounded-xl bg-brand-gold flex items-center justify-center text-brand-bg hover:bg-yellow-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <div className="flex items-center justify-between mt-2 px-1">
+              <span className="text-[10px] text-brand-muted">
+                Press <kbd className="bg-brand-card border border-brand-border px-1 rounded text-[9px]">Enter</kbd> to send, <kbd className="bg-brand-card border border-brand-border px-1 rounded text-[9px]">Shift+Enter</kbd> for new line
+              </span>
+              <span className="text-[10px] text-brand-muted">
+                Powered by <span className="text-white">OpenRouter</span> · {currentModel.label}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  );
+}

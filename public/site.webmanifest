@@ -1,0 +1,13 @@
+{
+  "name": "OrisTrade",
+  "short_name": "OrisTrade",
+  "description": "Multi-layer confluence trading signals",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0E1A",
+  "theme_color": "#D4AF37",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

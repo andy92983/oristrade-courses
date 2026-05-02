@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-bg: #0A0E1A;
+    --brand-card: #1A2035;
+    --brand-gold: #D4AF37;
+    --brand-green: #00C851;
+    --brand-red: #FF4444;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--brand-bg);
+    color: #ffffff;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A0E1A;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #252D45;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #D4AF37;
+  }
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-brand-gold text-brand-bg font-bold px-6 py-3 rounded-lg
+           hover:bg-brand-gold-light transition-all duration-200
+           shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40;
+  }
+
+  .btn-outline {
+    @apply border border-brand-gold text-brand-gold font-bold px-6 py-3 rounded-lg
+           hover:bg-brand-gold/10 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-brand-card border border-brand-border rounded-xl p-6;
+  }
+
+  .signal-score-bar {
+    @apply h-3 rounded-full bg-gradient-to-r from-brand-green to-brand-green/80
+           transition-all duration-1000 ease-out;
+  }
+
+  .signal-card {
+    @apply bg-brand-card border border-brand-border rounded-xl overflow-hidden
+           hover:border-brand-gold/40 transition-all duration-300;
+  }
+
+  .section-title {
+    @apply font-display text-3xl md:text-4xl font-bold text-white mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-brand-muted text-lg max-w-2xl mx-auto;
+  }
+
+  .gold-text {
+    @apply text-brand-gold;
+  }
+
+  .layer-badge {
+    @apply inline-flex items-center gap-1 bg-brand-gold/10 text-brand-gold
+           text-xs font-bold px-2 py-1 rounded-full border border-brand-gold/20;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #D4AF37, #E8C84A, #B8960C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+  }
+
+  .glow-green {
+    box-shadow: 0 0 20px rgba(0, 200, 81, 0.2);
+  }
+}

@@ -1,340 +1,186 @@
 'use client';
 
-import { useState } from 'react';
-
-const COURSES = [
-  {
-    id: 1,
-    title: 'Trading Fundamentals',
-    description: 'Learn the basics: chart types, timeframes, support/resistance, and risk management.',
-    category: 'Fundamentals',
-    level: 'Beginner',
-    duration: '8 hours',
-    tier: 'free',
-    lessons: 12,
-    icon: '📚',
-  },
-  {
-    id: 2,
-    title: 'Technical Analysis Mastery',
-    description: 'Master moving averages, RSI, MACD, Bollinger Bands, and advanced indicators.',
-    category: 'Technical Analysis',
-    level: 'Intermediate',
-    duration: '12 hours',
-    tier: 'starter',
-    lessons: 18,
-    icon: '📊',
-  },
-  {
-    id: 3,
-    title: 'Smart Money Concepts',
-    description: 'Order blocks, break of structure, market structure, and institutional trading patterns.',
-    category: 'Advanced Concepts',
-    level: 'Advanced',
-    duration: '15 hours',
-    tier: 'starter',
-    lessons: 20,
-    icon: '💡',
-  },
-  {
-    id: 4,
-    title: 'The OT Master Confluence System',
-    description: 'Andy\'s proprietary 10-system confluence indicator: ATR channels, Supertrend, SMC, EMA ribbons, and EvoX scoring.',
-    category: 'Proprietary',
-    level: 'Advanced',
-    duration: '20 hours',
-    tier: 'pro',
-    lessons: 25,
-    icon: '⚡',
-  },
-  {
-    id: 5,
-    title: 'Options Selling Fundamentals',
-    description: 'Spreads, Greeks, implied volatility, and how to manage credit spreads for consistent income.',
-    category: 'Options',
-    level: 'Intermediate',
-    duration: '14 hours',
-    tier: 'starter',
-    lessons: 19,
-    icon: '📈',
-  },
-  {
-    id: 6,
-    title: 'Scalping & Day Trading',
-    description: 'High-frequency entry/exit setups: momentum, pullbacks, breakouts, and time management.',
-    category: 'Day Trading',
-    level: 'Intermediate',
-    duration: '11 hours',
-    tier: 'starter',
-    lessons: 16,
-    icon: '⚡',
-  },
-  {
-    id: 7,
-    title: 'Macro Trading & Economic Data',
-    description: 'Fed policy, inflation, yield curves, correlation analysis, and macro-driven setups.',
-    category: 'Macro',
-    level: 'Advanced',
-    duration: '16 hours',
-    tier: 'pro',
-    lessons: 21,
-    icon: '🌍',
-  },
-  {
-    id: 8,
-    title: 'Psychology & Risk Management',
-    description: 'Discipline, position sizing, stop placement, emotional control, and trading journals.',
-    category: 'Mindset',
-    level: 'Beginner',
-    duration: '6 hours',
-    tier: 'free',
-    lessons: 10,
-    icon: '🧠',
-  },
-  {
-    id: 9,
-    title: 'Pine Script for Traders',
-    description: 'Code your own indicators and strategies: syntax, libraries, backtesting, and optimization.',
-    category: 'Automation',
-    level: 'Advanced',
-    duration: '18 hours',
-    tier: 'elite',
-    lessons: 24,
-    icon: '💻',
-  },
-];
-
-const TIER_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  free: { bg: '#0A0E1A', text: '#8892A4', border: '#252D45' },
-  starter: { bg: '#1A2035', text: '#D4AF37', border: '#D4AF37' },
-  pro: { bg: '#1A2035', text: '#00C851', border: '#00C851' },
-  elite: { bg: '#1A2035', text: '#D4AF37', border: '#D4AF37' },
-};
-
 export default function CoursesPage() {
-  const [filter, setFilter] = useState<string | null>(null);
-  const [levelFilter, setLevelFilter] = useState<string | null>(null);
-
-  const filtered = COURSES.filter((c) => {
-    if (filter && c.category !== filter) return false;
-    if (levelFilter && c.level !== levelFilter) return false;
-    return true;
-  });
+  const courses = [
+    { num: 1, title: "Trading Fundamentals", level: "Beginner", lessons: 12, icon: "📚", desc: "Chart types, timeframes, support/resistance, risk management" },
+    { num: 2, title: "Technical Analysis Mastery", level: "Intermediate", lessons: 18, icon: "📊", desc: "Moving averages, RSI, MACD, Bollinger Bands, advanced indicators" },
+    { num: 3, title: "Smart Money Concepts", level: "Advanced", lessons: 20, icon: "💡", desc: "Order blocks, break of structure, institutional trading patterns" },
+    { num: 4, title: "OT Master Confluence System", level: "Advanced", lessons: 25, icon: "⚡", desc: "Andy's proprietary 10-system indicator with live examples" },
+    { num: 5, title: "Options Selling Fundamentals", level: "Intermediate", lessons: 19, icon: "📈", desc: "Spreads, Greeks, IV management, credit spread rules" },
+    { num: 6, title: "Scalping & Day Trading", level: "Intermediate", lessons: 16, icon: "⚡", desc: "High-frequency entries, momentum, breakouts, time management" },
+  ];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', color: '#fff', padding: '40px 20px' }}>
-      {/* Header */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', marginBottom: '60px' }}>
-        <div style={{ marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '10px', color: '#D4AF37' }}>
-            Trading Mastery
+    <>
+      {/* Hero */}
+      <section className="pt-24 pb-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-brand-gold/10 border border-brand-gold/20 rounded-full px-4 py-1.5 mb-6">
+            <span className="text-brand-gold text-sm font-medium">📚 Learning Hub</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Master Trading <span className="text-brand-gold">From Scratch</span>
           </h1>
-          <p style={{ fontSize: '18px', color: '#8892A4', lineHeight: '1.6' }}>
-            Learn from Andy's 15+ years of trading experience. Master confluence analysis, order flow, macro trends, and the OrisTrade system.
+          <p className="text-xl text-brand-muted mb-10 leading-relaxed">
+            Structured courses from fundamentals to advanced strategies. Learn confluence analysis, smart money concepts, options selling, macro trading, and the OrisTrade system.
           </p>
-        </div>
-
-        {/* Navigation */}
-        <div style={{ display: 'flex', gap: '24px', marginBottom: '40px', fontSize: '14px' }}>
-          <a href="https://oristrade.com" style={{ color: '#D4AF37', textDecoration: 'none' }}>
-            ← Back to OrisTrade
-          </a>
-          <span style={{ color: '#252D45' }}>•</span>
-          <a href="/blog" style={{ color: '#D4AF37', textDecoration: 'none' }}>
-            Blog
-          </a>
-        </div>
-
-        {/* Filters */}
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '40px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#8892A4', marginBottom: '8px', textTransform: 'uppercase' }}>
-              Category
-            </label>
-            <select
-              value={filter || ''}
-              onChange={(e) => setFilter(e.target.value || null)}
-              style={{
-                padding: '10px 15px',
-                background: '#1A2035',
-                border: '1px solid #252D45',
-                color: '#fff',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://app.oristrade.com/signup"
+              className="inline-block bg-brand-gold text-brand-bg font-bold py-4 px-8 rounded-lg hover:opacity-90 transition-opacity"
             >
-              <option value="">All Categories</option>
-              <option value="Fundamentals">Fundamentals</option>
-              <option value="Technical Analysis">Technical Analysis</option>
-              <option value="Advanced Concepts">Advanced Concepts</option>
-              <option value="Proprietary">Proprietary</option>
-              <option value="Options">Options</option>
-              <option value="Day Trading">Day Trading</option>
-              <option value="Macro">Macro</option>
-              <option value="Mindset">Mindset</option>
-              <option value="Automation">Automation</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#8892A4', marginBottom: '8px', textTransform: 'uppercase' }}>
-              Level
-            </label>
-            <select
-              value={levelFilter || ''}
-              onChange={(e) => setLevelFilter(e.target.value || null)}
-              style={{
-                padding: '10px 15px',
-                background: '#1A2035',
-                border: '1px solid #252D45',
-                color: '#fff',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
+              Sign Up & Start Learning →
+            </a>
+            <a
+              href="#blog"
+              className="inline-block border-2 border-brand-gold text-brand-gold font-bold py-4 px-8 rounded-lg hover:bg-brand-gold/10 transition-colors"
             >
-              <option value="">All Levels</option>
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
-            </select>
+              Read Blog
+            </a>
           </div>
         </div>
+      </section>
 
-        <p style={{ fontSize: '14px', color: '#8892A4' }}>
-          {filtered.length} course{filtered.length !== 1 ? 's' : ''} found
-        </p>
-      </div>
-
-      {/* Course Grid */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '24px',
-          }}
-        >
-          {filtered.map((course) => {
-            const colors = TIER_COLORS[course.tier];
-            return (
-              <div
-                key={course.id}
-                style={{
-                  background: colors.bg,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'all 0.3s',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.borderColor = '#D4AF37';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.borderColor = colors.border;
-                }}
-              >
-                {/* Icon */}
-                <div style={{ fontSize: '32px', marginBottom: '12px' }}>{course.icon}</div>
-
-                {/* Title */}
-                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: colors.text }}>
-                  {course.title}
-                </h3>
-
-                {/* Description */}
-                <p style={{ fontSize: '14px', color: '#8892A4', marginBottom: '16px', flex: 1, lineHeight: '1.5' }}>
-                  {course.description}
-                </p>
-
-                {/* Meta */}
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap', fontSize: '12px', color: '#8892A4' }}>
-                  <span>📖 {course.lessons} lessons</span>
-                  <span>⏱️ {course.duration}</span>
+      {/* Courses Grid */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white text-center mb-16">Courses</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course) => (
+              <div key={course.num} className="bg-brand-card border border-brand-border rounded-lg p-8 hover:border-brand-gold/50 transition-colors">
+                <div className="text-5xl mb-4">{course.icon}</div>
+                <h3 className="text-xl font-bold text-white mb-2">{course.title}</h3>
+                <p className="text-brand-muted text-sm mb-6">{course.desc}</p>
+                <div className="flex items-center justify-between text-sm text-brand-muted mb-6">
+                  <span className="bg-brand-border px-3 py-1 rounded text-brand-gold font-medium">{course.level}</span>
+                  <span>{course.lessons} lessons</span>
                 </div>
-
-                {/* Level & Category */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      background: colors.border,
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      color: colors.text,
-                      fontWeight: '600',
-                    }}
-                  >
-                    {course.level}
-                  </span>
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      background: '#252D45',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      color: '#8892A4',
-                    }}
-                  >
-                    {course.category}
-                  </span>
-                </div>
-
-                {/* Tier Badge */}
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    background: colors.border,
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    color: colors.text,
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    marginBottom: '12px',
-                  }}
+                <a
+                  href="https://app.oristrade.com/education"
+                  className="block text-center py-2 px-4 border border-brand-gold text-brand-gold rounded hover:bg-brand-gold/10 transition-colors font-medium text-sm"
                 >
-                  {course.tier === 'free' ? '🎁 Free' : `${course.tier.charAt(0).toUpperCase() + course.tier.slice(1)} Tier`}
-                </div>
-
-                {/* CTA */}
-                <button
-                  onClick={() => {
-                    const url =
-                      course.tier === 'free'
-                        ? `https://app.oristrade.com/education?course=${course.id}`
-                        : `https://app.oristrade.com/pricing?course=${course.id}`;
-                    window.location.href = url;
-                  }}
-                  style={{
-                    padding: '10px 16px',
-                    background: colors.text,
-                    color: '#0A0E1A',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    transition: 'opacity 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                >
-                  {course.tier === 'free' ? 'Start Free' : 'View Pricing'}
-                </button>
+                  View Course →
+                </a>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <div style={{ maxWidth: '1200px', margin: '80px auto 0', padding: '40px 0', borderTop: '1px solid #252D45', textAlign: 'center', fontSize: '14px', color: '#8892A4' }}>
-        <p>All courses include lifetime access • Updated quarterly • Community support</p>
-      </div>
-    </div>
+      {/* Blog Section */}
+      <section id="blog" className="py-20 px-4 bg-brand-card/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-16">
+            <h2 className="text-4xl font-bold text-white">Latest Articles</h2>
+            <a href="#" className="text-brand-gold font-bold hover:text-brand-gold/80">
+              View All →
+            </a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                title: "The 12-Layer Signal Engine: How OrisTrade Scores Every Setup",
+                date: "May 1, 2026",
+                category: "Signals",
+                readTime: "8 min",
+                icon: "📊",
+              },
+              {
+                title: "Smart Money Concepts: BOS, ChoCh, and Order Blocks",
+                date: "Apr 29, 2026",
+                category: "Technical Analysis",
+                readTime: "12 min",
+                icon: "💡",
+              },
+              {
+                title: "Options Selling in High Volatility: Greeks, Theta, and Position Management",
+                date: "Apr 27, 2026",
+                category: "Options",
+                readTime: "10 min",
+                icon: "📈",
+              },
+              {
+                title: "Backtesting vs. Paper Trading: Why One Is Not Enough",
+                date: "Apr 25, 2026",
+                category: "Trading Psychology",
+                readTime: "9 min",
+                icon: "🧠",
+              },
+            ].map((article, idx) => (
+              <a
+                key={idx}
+                href="#"
+                className="group bg-brand-card border border-brand-border rounded-lg p-6 hover:border-brand-gold/50 transition-all"
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <span className="text-3xl">{article.icon}</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 text-sm text-brand-muted mb-2">
+                      <span>{article.date}</span>
+                      <span>•</span>
+                      <span className="text-brand-gold font-medium">{article.category}</span>
+                      <span>•</span>
+                      <span>{article.readTime}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white group-hover:text-brand-gold transition-colors">
+                      {article.title}
+                    </h3>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Learn with Us */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-white text-center mb-16">Why Learn With OrisTrade?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="border-l-4 border-brand-gold pl-6">
+              <h3 className="text-2xl font-bold text-white mb-3">🎓 Comprehensive Curriculum</h3>
+              <p className="text-brand-muted">
+                From complete beginner to advanced trader. Every course builds on the previous, creating a complete learning path from basics to institutional-level strategies.
+              </p>
+            </div>
+            <div className="border-l-4 border-brand-gold pl-6">
+              <h3 className="text-2xl font-bold text-white mb-3">📈 Real-World Examples</h3>
+              <p className="text-brand-muted">
+                Every lesson uses live market examples. See actual trades, live signals, and real profit/loss numbers. Learn the concepts that actually move markets.
+              </p>
+            </div>
+            <div className="border-l-4 border-brand-gold pl-6">
+              <h3 className="text-2xl font-bold text-white mb-3">👨‍🏫 Taught by a Veteran Trader</h3>
+              <p className="text-brand-muted">
+                15+ years of professional trading experience. Forex, futures, options, crypto. Learn the systems that have survived bull and bear markets.
+              </p>
+            </div>
+            <div className="border-l-4 border-brand-gold pl-6">
+              <h3 className="text-2xl font-bold text-white mb-3">⏰ Lifetime Access</h3>
+              <p className="text-brand-muted">
+                Watch courses at your own pace. Rewatch whenever you need. Updated quarterly with new market insights and system improvements.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-4 bg-brand-card/50">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">Start Learning Today</h2>
+          <p className="text-brand-muted text-lg mb-10">
+            All courses included with Starter tier ($49/mo) or upgrade anytime.
+          </p>
+          <a
+            href="https://app.oristrade.com/signup"
+            className="inline-block bg-brand-gold text-brand-bg font-bold py-4 px-10 rounded-lg hover:opacity-90 transition-opacity text-lg"
+          >
+            Create Free Account & Browse Courses →
+          </a>
+        </div>
+      </section>
+    </>
   );
 }

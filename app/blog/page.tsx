@@ -1,280 +1,209 @@
-'use client';
+import Link from "next/link";
+import type { Metadata } from "next";
 
-import { useState } from 'react';
+export const metadata: Metadata = {
+  title: "Blog & Analysis — OrisTrade",
+  description:
+    "Expert trading analysis, market breakdowns, and educational articles covering Forex, Futures, Options, and Crypto. SEO-optimized content by OrisTrade.",
+};
 
-const BLOG_POSTS = [
+const FEATURED_POST = {
+  title: "Why 90% of Traders Lose Money — and How to Be the 10%",
+  excerpt:
+    "The statistics are brutal: most retail traders lose. But the reasons aren't what you think. It's not about intelligence or strategy — it's about process, risk management, and understanding market structure. Here's what separates consistent winners from everyone else.",
+  category: "Trading Psychology",
+  date: "April 2026",
+  readTime: "8 min read",
+  slug: "#",
+};
+
+const POSTS = [
   {
-    id: 1,
-    title: 'The 12-Layer Signal Engine: How OrisTrade Scores Every Setup',
-    slug: 'signal-engine-explained',
-    excerpt: 'Understanding the confluence system that powers OrisTrade signals: order flow, technicals, macro, sentiment, and more.',
-    date: '2026-04-20',
-    author: 'Andy Bergstrom',
-    category: 'Signals',
-    readTime: '8 min',
-    image: '📊',
+    title: "How to Read Dark Pool Prints Like Institutional Traders",
+    excerpt:
+      "Dark pool transactions reveal where smart money is positioning. Learn to decode block trades, sweep orders, and large lot prints to trade with the institutions.",
+    category: "Order Flow",
+    date: "April 2026",
+    readTime: "6 min read",
+    slug: "#",
   },
   {
-    id: 2,
-    title: 'Smart Money Concepts: BOS, ChoCh, and Order Blocks',
-    slug: 'smart-money-concepts',
-    excerpt: 'Decode institutional trading patterns. Learn break of structure, change of character, and how order blocks predict reversals.',
-    date: '2026-04-18',
-    author: 'Andy Bergstrom',
-    category: 'Technical Analysis',
-    readTime: '12 min',
-    image: '💡',
+    title: "The Complete Guide to IV Rank for Options Sellers",
+    excerpt:
+      "Implied volatility rank tells you when premiums are expensive. Learn how to use IVR, IV percentile, and the OrisTrade Options Seller's Sweet Spot indicator.",
+    category: "Options",
+    date: "April 2026",
+    readTime: "7 min read",
+    slug: "#",
   },
   {
-    id: 3,
-    title: 'Options Selling in High Volatility: Greeks, Theta, and Position Management',
-    slug: 'options-high-volatility',
-    excerpt: 'How to scale credit spreads when VIX spikes. Managing delta, gamma risk, and early assignment.',
-    date: '2026-04-16',
-    author: 'Andy Bergstrom',
-    category: 'Options',
-    readTime: '10 min',
-    image: '📈',
+    title: "Multi-Timeframe Analysis: The One Strategy Every Trader Needs",
+    excerpt:
+      "Aligning the M5, M15, H1, H4, and D1 timeframes is the foundation of every reliable trade. Here's how OrisTrade's Layer 2 scores timeframe confluence.",
+    category: "Technical Analysis",
+    date: "April 2026",
+    readTime: "5 min read",
+    slug: "#",
   },
   {
-    id: 4,
-    title: 'Backtesting vs. Paper Trading: Why One Is Not Enough',
-    slug: 'backtesting-vs-paper',
-    excerpt: 'The gap between historical backtest results and live execution. Real case studies from trading strategies.',
-    date: '2026-04-14',
-    author: 'Andy Bergstrom',
-    category: 'Trading Psychology',
-    readTime: '9 min',
-    image: '🧠',
+    title: "How Congressional Trades Predict Stock Movements",
+    excerpt:
+      "Politicians trade stocks — and their timing is suspiciously good. OrisTrade tracks every congressional trade via SEC filings. Here's what we've found.",
+    category: "Insider Data",
+    date: "April 2026",
+    readTime: "6 min read",
+    slug: "#",
   },
   {
-    id: 5,
-    title: 'ATR, Bands, and Channels: Why OrisTrade Uses Multi-Level Confirmation',
-    slug: 'atr-bands-confluence',
-    excerpt: 'Deep dive into the OT Master Confluence indicator: ATR channel bands, Supertrend, and the EvoX scoring system.',
-    date: '2026-04-12',
-    author: 'Andy Bergstrom',
-    category: 'Indicators',
-    readTime: '11 min',
-    image: '⚡',
+    title: "Scalping the London Open: A 15-Minute Strategy",
+    excerpt:
+      "The London session open is one of the most volatile windows in forex. Here's a clean scalping setup using VWAP, volume spikes, and session range breakouts.",
+    category: "Scalping",
+    date: "April 2026",
+    readTime: "5 min read",
+    slug: "#",
   },
   {
-    id: 6,
-    title: 'Macro Driven Setups: Using FRED Data for Swing Trades',
-    slug: 'macro-fred-setups',
-    excerpt: 'How Fed policy, inflation, and yield curves create predictable swing trade opportunities.',
-    date: '2026-04-10',
-    author: 'Andy Bergstrom',
-    category: 'Macro Trading',
-    readTime: '13 min',
-    image: '🌍',
-  },
-  {
-    id: 7,
-    title: 'Scalping ES1! on the 1-Min: Entry, Exit, and Risk Rules',
-    slug: 'es-scalping-rules',
-    excerpt: 'Executable micro-scalping strategy: momentum divergence + volume confirmation + strict 10-second exits.',
-    date: '2026-04-08',
-    author: 'Andy Bergstrom',
-    category: 'Day Trading',
-    readTime: '7 min',
-    image: '⚡',
-  },
-  {
-    id: 8,
-    title: 'The Difference Between Noise and Signal: A Trader\'s Guide',
-    slug: 'signal-vs-noise',
-    excerpt: 'Why most traders lose: they trade every setup. We wait for confluence. Here\'s how to filter.',
-    date: '2026-04-06',
-    author: 'Andy Bergstrom',
-    category: 'Trading Psychology',
-    readTime: '10 min',
-    image: '🔍',
+    title: "Understanding the VIX: Your Market Fear Gauge",
+    excerpt:
+      "The VIX isn't just a number — it's a regime indicator. Learn how OrisTrade uses VIX levels to adjust signal confidence and identify risk-on vs risk-off environments.",
+    category: "Macro",
+    date: "April 2026",
+    readTime: "5 min read",
+    slug: "#",
   },
 ];
 
-const CATEGORIES = ['All', 'Signals', 'Technical Analysis', 'Options', 'Trading Psychology', 'Indicators', 'Macro Trading', 'Day Trading'];
+const CATEGORIES = [
+  "All",
+  "Order Flow",
+  "Technical Analysis",
+  "Options",
+  "Scalping",
+  "Macro",
+  "Trading Psychology",
+  "Insider Data",
+  "Crypto",
+];
 
 export default function BlogPage() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  const filtered = selectedCategory === 'All' ? BLOG_POSTS : BLOG_POSTS.filter((p) => p.category === selectedCategory);
-
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', color: '#fff', padding: '40px 20px' }}>
-      {/* Header */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', marginBottom: '60px' }}>
-        <div style={{ marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '10px', color: '#D4AF37' }}>
-            OrisTrade Blog
+    <>
+      {/* Hero */}
+      <section className="pt-28 pb-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <span className="layer-badge mb-4 inline-block">BLOG & ANALYSIS</span>
+          <h1 className="font-display font-black text-4xl md:text-6xl text-white leading-tight mb-6">
+            Market Intelligence, <span className="text-gradient-gold">Decoded</span>
           </h1>
-          <p style={{ fontSize: '18px', color: '#8892A4', lineHeight: '1.6' }}>
-            Trading insights, strategy breakdowns, and market analysis from Andy. Updated weekly.
+          <p className="text-brand-muted text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+            In-depth analysis, trading strategies, and educational content.
+            Written to help you understand the markets — not just follow signals.
           </p>
         </div>
+      </section>
 
-        {/* Navigation */}
-        <div style={{ marginBottom: '40px' }}>
-          <a href="https://courses.oristrade.com" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '14px' }}>
-            ← Back to Courses
-          </a>
+      {/* Category filters */}
+      <section className="px-4 pb-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {CATEGORIES.map((cat, i) => (
+              <button
+                key={cat}
+                className={`text-sm px-4 py-2 rounded-full border transition-all duration-200 ${
+                  i === 0
+                    ? "bg-brand-gold/10 text-brand-gold border-brand-gold/30"
+                    : "text-brand-muted border-brand-border hover:text-white hover:border-brand-gold/30"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Category Filter */}
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '40px' }}>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              style={{
-                padding: '8px 16px',
-                background: selectedCategory === cat ? '#D4AF37' : '#1A2035',
-                color: selectedCategory === cat ? '#0A0E1A' : '#D4AF37',
-                border: `1px solid ${selectedCategory === cat ? '#D4AF37' : '#252D45'}`,
-                borderRadius: '4px',
-                fontWeight: '600',
-                fontSize: '14px',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                if (selectedCategory !== cat) {
-                  e.currentTarget.style.borderColor = '#D4AF37';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedCategory !== cat) {
-                  e.currentTarget.style.borderColor = '#252D45';
-                }
-              }}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* Featured Post */}
+      <section className="px-4 pb-16">
+        <div className="max-w-5xl mx-auto">
+          <Link
+            href={FEATURED_POST.slug}
+            className="card block p-8 hover:border-brand-gold/40 transition-all duration-300 group"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <span className="bg-brand-gold/10 text-brand-gold text-xs font-bold px-2 py-0.5 rounded-full border border-brand-gold/20">
+                FEATURED
+              </span>
+              <span className="text-brand-muted text-xs">{FEATURED_POST.category}</span>
+              <span className="text-brand-border text-xs">|</span>
+              <span className="text-brand-muted text-xs">{FEATURED_POST.readTime}</span>
+            </div>
+            <h2 className="font-display font-bold text-white text-2xl md:text-3xl mb-3 group-hover:text-brand-gold transition-colors">
+              {FEATURED_POST.title}
+            </h2>
+            <p className="text-brand-muted text-base leading-relaxed mb-4 max-w-3xl">
+              {FEATURED_POST.excerpt}
+            </p>
+            <span className="text-brand-gold text-sm font-semibold group-hover:underline">
+              Read full article →
+            </span>
+          </Link>
         </div>
+      </section>
 
-        <p style={{ fontSize: '14px', color: '#8892A4' }}>
-          {filtered.length} article{filtered.length !== 1 ? 's' : ''}
-        </p>
-      </div>
+      {/* Post Grid */}
+      <section className="py-16 px-4 bg-brand-card/30 border-y border-brand-border">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="section-title text-center mb-10">Latest Articles</h2>
 
-      {/* Articles Grid */}
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {filtered.map((post) => (
-            <article
-              key={post.id}
-              style={{
-                background: '#1A2035',
-                border: '1px solid #252D45',
-                borderRadius: '8px',
-                padding: '24px',
-                display: 'flex',
-                gap: '24px',
-                transition: 'all 0.3s',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#D4AF37';
-                e.currentTarget.style.transform = 'translateX(4px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#252D45';
-                e.currentTarget.style.transform = 'translateX(0)';
-              }}
-            >
-              {/* Icon */}
-              <div style={{ fontSize: '48px', minWidth: '60px', textAlign: 'center' }}>{post.image}</div>
-
-              {/* Content */}
-              <div style={{ flex: 1 }}>
-                {/* Meta */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '12px', fontSize: '13px', color: '#8892A4' }}>
-                  <span>{post.date}</span>
-                  <span>•</span>
-                  <span>{post.readTime}</span>
-                  <span>•</span>
-                  <span
-                    style={{
-                      padding: '2px 8px',
-                      background: '#252D45',
-                      borderRadius: '3px',
-                      color: '#D4AF37',
-                      fontWeight: '600',
-                    }}
-                  >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {POSTS.map((post) => (
+              <Link
+                key={post.title}
+                href={post.slug}
+                className="card flex flex-col hover:border-brand-gold/30 transition-all duration-300 group"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-brand-bg border border-brand-border text-brand-muted text-xs px-2 py-0.5 rounded-md">
                     {post.category}
                   </span>
+                  <span className="text-brand-muted text-xs">{post.readTime}</span>
                 </div>
-
-                {/* Title */}
-                <h2 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '8px', color: '#fff', lineHeight: '1.4' }}>
+                <h3 className="font-display font-bold text-white text-lg mb-2 group-hover:text-brand-gold transition-colors flex-1">
                   {post.title}
-                </h2>
-
-                {/* Excerpt */}
-                <p style={{ fontSize: '15px', color: '#8892A4', marginBottom: '12px', lineHeight: '1.6' }}>
-                  {post.excerpt}
-                </p>
-
-                {/* Author */}
-                <p style={{ fontSize: '13px', color: '#8892A4' }}>
-                  by <span style={{ color: '#D4AF37', fontWeight: '600' }}>{post.author}</span>
-                </p>
-              </div>
-
-              {/* CTA Arrow */}
-              <div style={{ display: 'flex', alignItems: 'center', fontSize: '24px', color: '#D4AF37' }}>→</div>
-            </article>
-          ))}
+                </h3>
+                <p className="text-brand-muted text-sm leading-relaxed mb-4">{post.excerpt}</p>
+                <div className="flex items-center justify-between text-xs text-brand-muted border-t border-brand-border pt-3 mt-auto">
+                  <span>{post.date}</span>
+                  <span className="text-brand-gold font-semibold group-hover:underline">Read →</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Newsletter Section */}
-      <div style={{ maxWidth: '900px', margin: '80px auto 0', padding: '40px', background: '#1A2035', border: '1px solid #252D45', borderRadius: '8px', textAlign: 'center' }}>
-        <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '12px', color: '#D4AF37' }}>
-          Get Trading Insights Weekly
-        </h3>
-        <p style={{ fontSize: '15px', color: '#8892A4', marginBottom: '24px' }}>
-          Join 1,000+ traders receiving Andy's analysis, setup breakdowns, and signal explanations.
-        </p>
-        <div style={{ display: 'flex', gap: '12px', maxWidth: '400px', margin: '0 auto' }}>
-          <input
-            type="email"
-            placeholder="your@email.com"
-            style={{
-              flex: 1,
-              padding: '12px 16px',
-              background: '#0A0E1A',
-              border: '1px solid #252D45',
-              borderRadius: '4px',
-              color: '#fff',
-              fontSize: '14px',
-            }}
-          />
-          <button
-            style={{
-              padding: '12px 24px',
-              background: '#D4AF37',
-              color: '#0A0E1A',
-              border: 'none',
-              borderRadius: '4px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'opacity 0.2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-          >
-            Subscribe
-          </button>
+      {/* Newsletter */}
+      <section className="py-20 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <span className="layer-badge mb-4 inline-block">NEWSLETTER</span>
+          <h2 className="section-title">Get Weekly Market Analysis</h2>
+          <p className="section-subtitle mb-8">
+            Every Monday: market outlook, top signal setups, and educational content delivered to your inbox.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              className="flex-1 bg-brand-card border border-brand-border rounded-lg px-4 py-3 text-white placeholder:text-brand-muted text-sm focus:outline-none focus:border-brand-gold/50 transition-colors"
+            />
+            <button className="btn-gold text-sm whitespace-nowrap">
+              Subscribe →
+            </button>
+          </div>
+          <p className="text-brand-muted text-xs mt-3">No spam. Unsubscribe anytime.</p>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div style={{ maxWidth: '900px', margin: '80px auto 0', padding: '40px 0', borderTop: '1px solid #252D45', textAlign: 'center', fontSize: '14px', color: '#8892A4' }}>
-        <p>© 2026 OrisTrade | All insights for educational purposes</p>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
