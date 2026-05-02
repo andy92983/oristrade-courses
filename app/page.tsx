@@ -135,9 +135,13 @@ export default function CoursesPage() {
         </div>
 
         {/* Navigation */}
-        <div style={{ marginBottom: '40px' }}>
-          <a href="https://oristrade.com" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '14px' }}>
+        <div style={{ display: 'flex', gap: '24px', marginBottom: '40px', fontSize: '14px' }}>
+          <a href="https://oristrade.com" style={{ color: '#D4AF37', textDecoration: 'none' }}>
             ← Back to OrisTrade
+          </a>
+          <span style={{ color: '#252D45' }}>•</span>
+          <a href="/blog" style={{ color: '#D4AF37', textDecoration: 'none' }}>
+            Blog
           </a>
         </div>
 
