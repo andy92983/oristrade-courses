@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-import { SidebarLayout } from "../components/layout/SidebarLayout";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -52,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body className="bg-brand-bg text-brand-text font-sans antialiased">
-        <SidebarLayout>{children}</SidebarLayout>
+        {children}
       </body>
     </html>
   );
