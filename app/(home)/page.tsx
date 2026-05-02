@@ -66,6 +66,13 @@ const COURSES = [
 
 const ARTICLES = [
   {
+    title: "Why 90% of Traders Lose Money — and How to Be the 10%",
+    date: "May 3, 2026",
+    category: "Trading Psychology",
+    readTime: "8 min",
+    excerpt: "The statistics are brutal: most retail traders lose. But the reasons aren't what you think. It's not about intelligence or strategy — it's about process, risk management, and understanding market structure.",
+  },
+  {
     title: "The 12-Layer Signal Engine: How OrisTrade Scores Every Setup",
     date: "May 1, 2026",
     category: "System",
@@ -92,6 +99,48 @@ const ARTICLES = [
     category: "Psychology",
     readTime: "9 min",
     excerpt: "Backtests don't fail. Traders fail. The forward test is where the system meets the trader's nervous system.",
+  },
+  {
+    title: "How to Read Dark Pool Prints Like Institutional Traders",
+    date: "Apr 23, 2026",
+    category: "Order Flow",
+    readTime: "6 min",
+    excerpt: "Dark pool transactions reveal where smart money is positioning. Learn to decode block trades, sweep orders, and large lot prints to trade with the institutions.",
+  },
+  {
+    title: "The Complete Guide to IV Rank for Options Sellers",
+    date: "Apr 21, 2026",
+    category: "Options",
+    readTime: "7 min",
+    excerpt: "Implied volatility rank tells you when premiums are expensive. Learn how to use IVR, IV percentile, and the OrisTrade Options Seller's Sweet Spot indicator.",
+  },
+  {
+    title: "Multi-Timeframe Analysis: The One Strategy Every Trader Needs",
+    date: "Apr 19, 2026",
+    category: "Technical Analysis",
+    readTime: "5 min",
+    excerpt: "Aligning the M5, M15, H1, H4, and D1 timeframes is the foundation of every reliable trade. Here's how OrisTrade's Layer 2 scores timeframe confluence.",
+  },
+  {
+    title: "How Congressional Trades Predict Stock Movements",
+    date: "Apr 17, 2026",
+    category: "Insider Data",
+    readTime: "6 min",
+    excerpt: "Politicians trade stocks — and their timing is suspiciously good. OrisTrade tracks every congressional trade via SEC filings. Here's what we've found.",
+  },
+  {
+    title: "Scalping the London Open: A 15-Minute Strategy",
+    date: "Apr 15, 2026",
+    category: "Scalping",
+    readTime: "5 min",
+    excerpt: "The London session open is one of the most volatile windows in forex. Here's a clean scalping setup using VWAP, volume spikes, and session range breakouts.",
+  },
+  {
+    title: "Understanding the VIX: Your Market Fear Gauge",
+    date: "Apr 13, 2026",
+    category: "Macro",
+    readTime: "5 min",
+    excerpt: "The VIX isn't just a number — it's a regime indicator. Learn how OrisTrade uses VIX levels to adjust signal confidence and identify risk-on vs risk-off environments.",
   },
 ];
 
