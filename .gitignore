@@ -1,0 +1,9 @@
+.next
+out
+*.swp
+*.swo
+*~
+.DS_Store
+node_modules
+.env.local
+.env
