@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OrisLogoFull } from "../brand/OrisLogo";
 
 const footerLinks = {
   Platform: [
@@ -29,14 +30,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gold-gradient flex items-center justify-center">
-                <span className="text-brand-bg font-display font-black text-sm">O</span>
-              </div>
-              <span className="font-display font-bold text-xl">
-                <span className="text-gradient-gold">Oris</span>
-                <span className="text-white">Trade</span>
-              </span>
+            <Link href="/" className="inline-block mb-4">
+              <OrisLogoFull className="h-10 w-auto max-w-[240px]" />
             </Link>
             <p className="text-brand-muted text-sm leading-relaxed mb-6">
               Where Precision Meets Profit. 12-layer market intelligence for traders who want the edge.

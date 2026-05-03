@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signUp } from "../../lib/supabase/auth";
 import { supabase } from "../../lib/supabase/client";
+import { OrisLogoFull } from "../../components/brand/OrisLogo";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -61,14 +62,8 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gold-gradient flex items-center justify-center">
-              <span className="text-brand-bg font-display font-black">O</span>
-            </div>
-            <span className="font-display font-bold text-2xl">
-              <span className="text-gradient-gold">Oris</span>
-              <span className="text-white">Trade</span>
-            </span>
+          <Link href="/" className="inline-flex items-center justify-center mb-6">
+            <OrisLogoFull className="h-11 w-auto max-w-[min(280px,90vw)]" />
           </Link>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Create Your Account</h1>
           <p className="text-brand-muted text-sm">Start with free access. Upgrade anytime.</p>

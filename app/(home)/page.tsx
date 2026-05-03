@@ -1,5 +1,7 @@
 'use client';
 
+import { OrisLogoFull, OrisLogoMark } from "../../components/brand/OrisLogo";
+
 const COURSES = [
   {
     num: "01",
@@ -150,14 +152,9 @@ export default function CoursesPage() {
       {/* Top Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-brand-bg/80 border-b border-brand-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="https://oristrade.com" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-gold to-brand-gold-light flex items-center justify-center font-display font-black text-brand-bg text-lg">
-              O
-            </div>
-            <span className="font-display font-bold text-xl tracking-tight">
-              Oris<span className="text-brand-gold">Trade</span>
-            </span>
-            <span className="hidden sm:inline-block text-brand-muted text-sm border-l border-brand-border pl-3 ml-2">Learning Hub</span>
+          <a href="https://oristrade.com" className="flex items-center gap-3 min-w-0">
+            <OrisLogoFull className="h-9 sm:h-10 max-w-[200px]" />
+            <span className="hidden sm:inline-block text-brand-muted text-sm border-l border-brand-border pl-3 shrink-0">Learning Hub</span>
           </a>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <a href="#courses" className="text-brand-muted hover:text-white transition-colors">Courses</a>
@@ -437,8 +434,8 @@ export default function CoursesPage() {
       {/* Footer */}
       <footer className="border-t border-brand-border py-12 px-6">
         <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-brand-muted">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-gradient-to-br from-brand-gold to-brand-gold-light flex items-center justify-center font-display font-black text-brand-bg text-sm">O</div>
+          <div className="flex items-center gap-2 min-w-0">
+            <OrisLogoMark className="h-7 w-7" />
             <span>© 2026 OrisTrade · Learning Hub</span>
           </div>
           <div className="flex gap-6">

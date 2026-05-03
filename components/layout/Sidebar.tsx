@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/supabase/useAuth";
 import { signOut } from "../../lib/supabase/auth";
 import { TIER_CONFIG } from "../../lib/supabase/client";
+import { OrisLogoFull, OrisLogoMark } from "../brand/OrisLogo";
 
 // ─── Nav structure ────────────────────────────────────────────────────────────
 const NAV = [
@@ -112,47 +113,50 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     return (
       <div className="flex flex-col h-full">
         {/* Logo + toggle */}
-        <div className={`flex items-center border-b border-brand-border flex-shrink-0 h-14 ${collapsed && !mobile ? "justify-center px-0" : "px-4 justify-between"}`}>
-          {(!collapsed || mobile) && (
-            <Link href="/" onClick={close} className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gold-gradient flex items-center justify-center flex-shrink-0">
-                <span className="text-brand-bg font-display font-black text-xs">O</span>
-              </div>
-              <span className="font-display font-bold text-lg">
-                <span className="text-gradient-gold">Oris</span>
-                <span className="text-white">Trade</span>
-              </span>
-            </Link>
-          )}
-
-          {/* Collapse / expand toggle (desktop only) */}
-          {!mobile && (
-            <button
-              onClick={onToggle}
-              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className={`text-brand-muted hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 flex-shrink-0 ${collapsed ? "mx-auto" : ""}`}
-            >
-              {collapsed ? (
-                // Chevron right (expand)
+        <div
+          className={`flex items-center border-b border-brand-border flex-shrink-0 h-14 ${
+            collapsed && !mobile ? "px-1 justify-between gap-1" : "px-4 justify-between"
+          }`}
+        >
+          {collapsed && !mobile ? (
+            <>
+              <Link href="/" title="OrisTrade" className="flex flex-1 justify-center min-w-0 py-1">
+                <OrisLogoMark className="h-8 w-8" />
+              </Link>
+              <button
+                onClick={onToggle}
+                title="Expand sidebar"
+                className="text-brand-muted hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 flex-shrink-0"
+              >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              ) : (
-                // Chevron left (collapse)
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/" onClick={close} className="flex items-center min-w-0 flex-1 mr-2">
+                <OrisLogoFull className="h-8 sm:h-9 max-w-[200px]" />
+              </Link>
+              {!mobile && (
+                <button
+                  onClick={onToggle}
+                  title="Collapse sidebar"
+                  className="text-brand-muted hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 flex-shrink-0"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
               )}
-            </button>
-          )}
-
-          {/* Mobile close button */}
-          {mobile && (
-            <button onClick={close} className="text-brand-muted hover:text-white p-1.5">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              {mobile && (
+                <button onClick={close} className="text-brand-muted hover:text-white p-1.5">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </>
           )}
         </div>
 
@@ -258,14 +262,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     <>
       {/* ── Mobile top bar ── */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border flex items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gold-gradient flex items-center justify-center">
-            <span className="text-brand-bg font-display font-black text-xs">O</span>
-          </div>
-          <span className="font-display font-bold text-lg">
-            <span className="text-gradient-gold">Oris</span>
-            <span className="text-white">Trade</span>
-          </span>
+        <Link href="/" className="flex items-center min-w-0 max-w-[72%]">
+          <OrisLogoFull className="h-8 w-auto max-h-8" />
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
