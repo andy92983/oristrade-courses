@@ -4,8 +4,8 @@ export function OrisLogoFull({ className = "" }: { className?: string }) {
     <img
       src="/brand/logo-full.png"
       alt="OrisTrade — Where Precision Meets Profit"
-      width={484}
-      height={200}
+      width={1662}
+      height={446}
       className={`h-8 w-auto max-w-[min(280px,92vw)] object-contain object-left ${className}`}
       decoding="async"
     />
@@ -18,8 +18,8 @@ export function OrisLogoMark({ className = "" }: { className?: string }) {
     <img
       src="/brand/mark.png"
       alt="OrisTrade"
-      width={64}
-      height={64}
+      width={1662}
+      height={446}
       className={`h-8 w-8 object-contain ${className}`}
       decoding="async"
     />
