@@ -1,10 +1,58 @@
+import { createBrowserClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Public anon keys — safe to include in client-side code (Supabase RLS protects the data)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://kjtmslsboucvehhzdfty.supabase.co";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_LHwM8ShL6a5oN-41MeVEsQ_pApyEMMx";
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/**
+ * Cookie domain `.oristrade.com` shares the Supabase session between apex (marketing)
+ * and subdomains (journal, courses, app). Default `createClient` uses localStorage,
+ * which is per-origin only — a session on journal would not appear on oristrade.com.
+ */
+function orisTradeAuthCookieDomain(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const h = window.location.hostname;
+  if (h === "localhost" || h === "127.0.0.1") return undefined;
+  if (h === "oristrade.com" || h.endsWith(".oristrade.com")) return ".oristrade.com";
+  return undefined;
+}
+
+let browserClient: SupabaseClient | null = null;
+let buildFallbackClient: SupabaseClient | null = null;
+
+function createSupabase(): SupabaseClient {
+  if (typeof window !== "undefined") {
+    if (!browserClient) {
+      const domain = orisTradeAuthCookieDomain();
+      browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+        cookieOptions: {
+          path: "/",
+          sameSite: "lax",
+          secure: window.location.protocol === "https:",
+          ...(domain ? { domain } : {}),
+        },
+      });
+    }
+    return browserClient;
+  }
+  if (!buildFallbackClient) {
+    buildFallbackClient = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return buildFallbackClient;
+}
+
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = createSupabase();
+    const value = Reflect.get(client, prop, client);
+    if (typeof value === "function") {
+      return value.bind(client);
+    }
+    return value;
+  },
+});
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
