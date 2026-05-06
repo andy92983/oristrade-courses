@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { SignalCard } from "../../components/signals/signalcard";
 import type { Signal } from "../../components/signals/signalcard";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 import { useAuth } from "../../lib/supabase/useAuth";
 
 // ─── Demo signals — April 11, 2026 ───────────────────────────────────────────
@@ -186,7 +187,7 @@ export default function SignalsPage() {
                   </span>
                 </span>
               </div>
-              <Link href="https://app.oristrade.com/dashboard" className="btn-gold text-xs py-2 px-4 whitespace-nowrap flex-shrink-0">
+              <Link href={APP_DASHBOARD_URL} className="btn-gold text-xs py-2 px-4 whitespace-nowrap flex-shrink-0">
                 Go to Live Dashboard →
               </Link>
             </div>

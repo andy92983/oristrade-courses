@@ -1,6 +1,7 @@
 'use client';
 
 import { OrisLogoFull, OrisLogoMark } from "../../components/brand/OrisLogo";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 
 const COURSES = [
   {
@@ -440,7 +441,7 @@ export default function CoursesPage() {
           </div>
           <div className="flex gap-6">
             <a href="https://oristrade.com" className="hover:text-white">Home</a>
-            <a href="https://app.oristrade.com/dashboard" className="hover:text-white">Dashboard</a>
+            <a href={APP_DASHBOARD_URL} className="hover:text-white">Dashboard</a>
             <a href="https://journal.oristrade.com" className="hover:text-white">Journal</a>
           </div>
         </div>

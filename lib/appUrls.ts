@@ -1,2 +1,2 @@
-/** Canonical member dashboard (signals) — not hosted on journal/courses subdomains. */
-export const APP_DASHBOARD_URL = "https://app.oristrade.com/dashboard";
+/** Post-login and /dashboard redirect: courses marketing home (not app.oristrade.com). */
+export const APP_DASHBOARD_URL = "https://courses.oristrade.com/";
