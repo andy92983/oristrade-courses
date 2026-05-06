@@ -45,22 +45,23 @@ export function MarketOverview() {
         },
         {
           title: "Indices",
+          /* FOREXCOM / TVC: symbols that load reliably in the free Market Overview embed (futures like CME_MINI:ES1! often show empty). */
           symbols: [
-            { s: "CME_MINI:ES1!", d: "S&P 500 Futures" },
-            { s: "CME_MINI:NQ1!", d: "NASDAQ Futures" },
-            { s: "CBOT_MINI:YM1!", d: "Dow Futures" },
-            { s: "CME:RTY1!", d: "Russell 2000" },
-            { s: "CBOE:VIX", d: "VIX Fear Index" },
+            { s: "FOREXCOM:SPXUSD", d: "S&P 500" },
+            { s: "FOREXCOM:NSXUSD", d: "Nasdaq 100" },
+            { s: "FOREXCOM:DJI", d: "Dow 30" },
+            { s: "TVC:RUT", d: "Russell 2000" },
+            { s: "TVC:VIX", d: "VIX" },
           ],
           originalTitle: "Indices",
         },
         {
           title: "Commodities",
           symbols: [
-            { s: "COMEX:GC1!", d: "Gold" },
-            { s: "COMEX:SI1!", d: "Silver" },
-            { s: "NYMEX:CL1!", d: "Crude Oil" },
-            { s: "NYMEX:NG1!", d: "Natural Gas" },
+            { s: "OANDA:XAUUSD", d: "Gold" },
+            { s: "OANDA:XAGUSD", d: "Silver" },
+            { s: "TVC:USOIL", d: "WTI Crude Oil" },
+            { s: "FOREXCOM:NATURALGAS", d: "Natural Gas" },
           ],
           originalTitle: "Commodities",
         },
