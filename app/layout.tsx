@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { SiteDisclaimerFooter } from "@/components/legal/SiteDisclaimer";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -51,7 +52,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body className="bg-brand-bg text-brand-text font-sans antialiased">
-        {children}
+        <div className="flex min-h-screen flex-col">
+          <div className="flex-1 flex flex-col min-w-0">{children}</div>
+          <SiteDisclaimerFooter />
+        </div>
       </body>
     </html>
   );
