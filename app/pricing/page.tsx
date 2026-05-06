@@ -38,7 +38,7 @@ const TIERS = [
       { text: "Options analytics", included: false },
     ],
     cta: "Get Started Free",
-    href: "/signals",
+    href: "/signup",
     highlight: false,
   },
   {
@@ -306,7 +306,7 @@ export default function PricingPage() {
           <p className="text-brand-muted text-lg mb-8">
             No credit card required for the Free tier. Upgrade anytime as your trading evolves.
           </p>
-          <Link href="/signals" className="btn-gold text-base py-4 px-8">
+          <Link href="/signup" className="btn-gold text-base py-4 px-8">
             View Live Signals →
           </Link>
         </div>

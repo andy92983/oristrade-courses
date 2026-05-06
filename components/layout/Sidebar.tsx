@@ -246,7 +246,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <Link href="/login" onClick={close} className="block text-center text-sm text-brand-muted hover:text-white transition-colors py-1.5">
                     Log in
                   </Link>
-                  <Link href="/pricing" onClick={close} className="btn-gold text-sm text-center block">
+                  <Link href="/signup" onClick={close} className="btn-gold text-sm text-center block">
                     Start Free →
                   </Link>
                 </>

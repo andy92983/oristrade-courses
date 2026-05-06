@@ -163,8 +163,8 @@ export default function CoursesPage() {
             <a href="https://journal.oristrade.com" className="text-brand-muted hover:text-white transition-colors">Journal</a>
           </div>
           <div className="flex items-center gap-3">
-            <a href="https://app.oristrade.com/login" className="text-sm font-medium text-brand-muted hover:text-white transition-colors hidden sm:inline">Log in</a>
-            <a href="https://app.oristrade.com/signup" className="btn-gold text-sm py-2 px-4">Start Free</a>
+            <a href="/login" className="text-sm font-medium text-brand-muted hover:text-white transition-colors hidden sm:inline">Log in</a>
+            <a href="/signup" className="btn-gold text-sm py-2 px-4">Start Free</a>
           </div>
         </div>
       </nav>
@@ -196,7 +196,7 @@ export default function CoursesPage() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="#courses" className="btn-gold">Browse Courses →</a>
-              <a href="https://app.oristrade.com/signup" className="btn-outline">Sign Up Free</a>
+              <a href="/signup" className="btn-outline">Sign Up Free</a>
             </div>
           </div>
 
@@ -278,7 +278,7 @@ export default function CoursesPage() {
                     <span>{course.duration}</span>
                   </div>
                   <a
-                    href="https://app.oristrade.com/education"
+                    href="/education"
                     className="text-brand-gold text-sm font-bold opacity-60 group-hover:opacity-100 transition-opacity"
                     aria-label={`View ${course.title}`}
                   >
@@ -303,7 +303,7 @@ export default function CoursesPage() {
               <p className="text-brand-muted text-lg leading-relaxed mb-8">
                 You've watched the videos. Read the books. Taken the courses. Still losing money. The problem isn't more content — it's connected content. A real curriculum, taught by someone who's actually traded for fifteen years.
               </p>
-              <a href="https://app.oristrade.com/about" className="text-brand-gold font-bold inline-flex items-center gap-2 hover:gap-3 transition-all">
+              <a href="/about" className="text-brand-gold font-bold inline-flex items-center gap-2 hover:gap-3 transition-all">
                 About the founder <span>→</span>
               </a>
             </div>
@@ -335,7 +335,7 @@ export default function CoursesPage() {
                 Latest reads.
               </h2>
             </div>
-            <a href="https://app.oristrade.com/blog" className="text-brand-gold font-bold hover:text-brand-gold-light hidden sm:inline-flex items-center gap-2">
+            <a href="/blog" className="text-brand-gold font-bold hover:text-brand-gold-light hidden sm:inline-flex items-center gap-2">
               All articles →
             </a>
           </div>
@@ -386,7 +386,7 @@ export default function CoursesPage() {
           </div>
 
           <div className="text-center sm:hidden">
-            <a href="https://app.oristrade.com/blog" className="text-brand-gold font-bold">
+            <a href="/blog" className="text-brand-gold font-bold">
               All articles →
             </a>
           </div>
@@ -425,7 +425,7 @@ export default function CoursesPage() {
             All courses included with the Starter tier. Free preview lessons available — no credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="https://app.oristrade.com/signup" className="btn-gold">Create Free Account →</a>
+            <a href="/signup" className="btn-gold">Create Free Account →</a>
             <a href="https://oristrade.com#pricing" className="btn-outline">View Pricing</a>
           </div>
         </div>
@@ -440,7 +440,7 @@ export default function CoursesPage() {
           </div>
           <div className="flex gap-6">
             <a href="https://oristrade.com" className="hover:text-white">Home</a>
-            <a href="https://app.oristrade.com" className="hover:text-white">Dashboard</a>
+            <a href="https://app.oristrade.com/dashboard" className="hover:text-white">Dashboard</a>
             <a href="https://journal.oristrade.com" className="hover:text-white">Journal</a>
           </div>
         </div>

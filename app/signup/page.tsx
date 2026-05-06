@@ -2,25 +2,31 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signUp } from "../../lib/supabase/auth";
+import type { Session } from "@supabase/supabase-js";
+import { signUp, signOut } from "../../lib/supabase/auth";
 import { supabase } from "../../lib/supabase/client";
 import { OrisLogoFull } from "../../components/brand/OrisLogo";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [success, setSuccess]   = useState(false);
+  const [session, setSession]   = useState<Session | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/dashboard");
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      setSessionReady(true);
     });
-  }, [router]);
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -57,6 +63,8 @@ export default function SignupPage() {
     );
   }
 
+  const alreadySignedIn = sessionReady && !!session;
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 pt-16">
       <div className="w-full max-w-md">
@@ -69,6 +77,32 @@ export default function SignupPage() {
           <p className="text-brand-muted text-sm">Start with free access. Upgrade anytime.</p>
         </div>
 
+        {!sessionReady ? (
+          <div className="card text-center py-10 text-brand-muted text-sm">Loading…</div>
+        ) : alreadySignedIn ? (
+          <div className="card space-y-4">
+            <p className="text-brand-muted text-sm">
+              You&apos;re already signed in as{" "}
+              <span className="text-white font-semibold">{session.user.email}</span>.
+            </p>
+            <p className="text-brand-muted text-xs leading-relaxed">
+              To open a second account, sign out first. Otherwise continue to your dashboard or the main app.
+            </p>
+            <Link href="/dashboard" className="btn-gold w-full text-center block">
+              Go to dashboard →
+            </Link>
+            <button
+              type="button"
+              onClick={async () => {
+                await signOut();
+                setSession(null);
+              }}
+              className="w-full text-center text-sm text-brand-muted hover:text-white border border-brand-border rounded-lg py-3 transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
         <div className="card">
           <form onSubmit={handleSignup} className="space-y-4">
             {error && (
@@ -122,7 +156,10 @@ export default function SignupPage() {
             </button>
           </form>
         </div>
+        )}
 
+        {!alreadySignedIn ? (
+        <>
         <p className="text-center text-brand-muted text-sm mt-6">
           Already have an account?{" "}
           <Link href="/login" className="text-brand-gold hover:underline font-semibold">
@@ -135,6 +172,8 @@ export default function SignupPage() {
           <Link href="/terms" className="hover:text-white">Terms of Service</Link> and{" "}
           <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
         </p>
+        </>
+        ) : null}
       </div>
     </div>
   );

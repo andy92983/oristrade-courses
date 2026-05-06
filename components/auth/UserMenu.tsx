@@ -35,7 +35,7 @@ export function UserMenu() {
         <Link href="/login" className="text-brand-muted hover:text-white text-sm font-medium transition-colors">
           Log in
         </Link>
-        <Link href="/pricing" className="btn-gold text-sm py-2 px-4">
+        <Link href="/signup" className="btn-gold text-sm py-2 px-4">
           Start Free →
         </Link>
       </div>
