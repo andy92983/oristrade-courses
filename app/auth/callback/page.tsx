@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase/client";
+import { APP_DASHBOARD_URL } from "../../../lib/appUrls";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -10,7 +11,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     // Supabase handles the token exchange automatically from the URL hash
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/dashboard");
+      if (session) window.location.replace(APP_DASHBOARD_URL);
       else router.replace("/login");
     });
   }, [router]);

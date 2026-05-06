@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 import { useAuth } from "../../lib/supabase/useAuth";
 
 interface AuthGuardProps {
@@ -39,7 +40,7 @@ export function AuthGuard({ children, requireAdmin = false, requiredTier }: Auth
 
     // Admin check — only redirect once profile is confirmed loaded
     if (requireAdmin && !profile?.is_admin) {
-      router.replace("/dashboard");
+      if (typeof window !== "undefined") window.location.replace(APP_DASHBOARD_URL);
       return;
     }
 

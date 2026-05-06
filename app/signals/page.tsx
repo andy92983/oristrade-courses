@@ -186,7 +186,7 @@ export default function SignalsPage() {
                   </span>
                 </span>
               </div>
-              <Link href="/dashboard" className="btn-gold text-xs py-2 px-4 whitespace-nowrap flex-shrink-0">
+              <Link href="https://app.oristrade.com/dashboard" className="btn-gold text-xs py-2 px-4 whitespace-nowrap flex-shrink-0">
                 Go to Live Dashboard →
               </Link>
             </div>

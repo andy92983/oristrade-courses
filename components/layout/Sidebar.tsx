@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/supabase/useAuth";
 import { signOut } from "../../lib/supabase/auth";
 import { TIER_CONFIG } from "../../lib/supabase/client";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 import { OrisLogoFull, OrisLogoMark } from "../brand/OrisLogo";
 
 // ─── Nav structure ────────────────────────────────────────────────────────────
@@ -14,7 +15,7 @@ const NAV = [
   {
     group: "Trading",
     links: [
-      { label: "Dashboard",     href: "/dashboard",     icon: "⚡" },
+      { label: "Dashboard",     href: APP_DASHBOARD_URL, icon: "⚡" },
       { label: "Charts",        href: "/charts",         icon: "📈" },
       { label: "Signals",       href: "/signals",        icon: "🎯" },
       { label: "Markets",       href: "/markets",        icon: "🌍" },
@@ -72,6 +73,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   }
 
   const isActive = (href: string) => {
+    if (href.startsWith("http://") || href.startsWith("https://")) return false;
     if (href === "/") return pathname === "/";
     // Exact match for /admin, not startsWith
     if (href === "/admin") return pathname === "/admin";

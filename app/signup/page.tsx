@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { signUp, signOut } from "../../lib/supabase/auth";
 import { supabase } from "../../lib/supabase/client";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 import { OrisLogoFull } from "../../components/brand/OrisLogo";
 
 export default function SignupPage() {
@@ -88,9 +89,9 @@ export default function SignupPage() {
             <p className="text-brand-muted text-xs leading-relaxed">
               To open a second account, sign out first. Otherwise continue to your dashboard or the main app.
             </p>
-            <Link href="/dashboard" className="btn-gold w-full text-center block">
+            <a href={APP_DASHBOARD_URL} className="btn-gold w-full text-center block">
               Go to dashboard →
-            </Link>
+            </a>
             <button
               type="button"
               onClick={async () => {

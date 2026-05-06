@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/supabase/useAuth";
 import { signOut } from "../../lib/supabase/auth";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 import { TIER_CONFIG } from "../../lib/supabase/client";
 
 export function UserMenu() {
@@ -76,7 +77,7 @@ export function UserMenu() {
 
           {/* Menu items */}
           <div className="py-1">
-            <Link href="/dashboard" onClick={() => setOpen(false)}
+            <Link href={APP_DASHBOARD_URL} onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-4 py-2.5 text-sm text-brand-muted hover:text-white hover:bg-brand-bg transition-colors">
               <span>📊</span> Dashboard
             </Link>

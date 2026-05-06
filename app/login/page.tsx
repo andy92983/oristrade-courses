@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signIn, sendPasswordReset } from "../../lib/supabase/auth";
 import { supabase } from "../../lib/supabase/client";
 import { OrisLogoFull } from "../../components/brand/OrisLogo";
+import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
@@ -19,9 +18,9 @@ export default function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/dashboard");
+      if (session) window.location.replace(APP_DASHBOARD_URL);
     });
-  }, [router]);
+  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +32,7 @@ export default function LoginPage() {
       setError(err.message);
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      window.location.assign(APP_DASHBOARD_URL);
     }
   }
 
