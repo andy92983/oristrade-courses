@@ -1,5 +1,6 @@
 'use client';
 
+import { UserMenu } from "../../components/auth/UserMenu";
 import { OrisLogoFull, OrisLogoMark } from "../../components/brand/OrisLogo";
 import { APP_DASHBOARD_URL } from "../../lib/appUrls";
 
@@ -163,9 +164,8 @@ export default function CoursesPage() {
             <a href="https://oristrade.com#pricing" className="text-brand-muted hover:text-white transition-colors">Pricing</a>
             <a href="https://journal.oristrade.com" className="text-brand-muted hover:text-white transition-colors">Journal</a>
           </div>
-          <div className="flex items-center gap-3">
-            <a href="/login" className="text-sm font-medium text-brand-muted hover:text-white transition-colors hidden sm:inline">Log in</a>
-            <a href="/signup" className="btn-gold text-sm py-2 px-4">Start Free</a>
+          <div className="flex items-center gap-3 shrink-0">
+            <UserMenu />
           </div>
         </div>
       </nav>
